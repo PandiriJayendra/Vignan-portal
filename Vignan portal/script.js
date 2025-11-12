@@ -11,27 +11,29 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
     }
 
-    // --- 2. Scroll-Reveal Animation ---
-    
-    // Select all elements you want to animate
-    const hiddenElements = document.querySelectorAll('.hidden');
+    // --- Page Reveal Animation ---
+    const pageTransition = document.createElement('div');
+    pageTransition.className = 'page-transition';
+    document.body.appendChild(pageTransition);
 
-    // Set up the observer
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                // When the element is in view, add the 'show' class
-                entry.target.classList.add('show');
-            } else {
-                // Optional: Remove 'show' to re-animate every time
-                // entry.target.classList.remove('show'); 
-            }
-        });
-    }, {
-        threshold: 0.1 // Trigger when 10% of the element is visible
+    setTimeout(() => {
+        pageTransition.classList.add('hide');
+    }, 100); // Fade out after page loads
+
+    // Fade in overlay before navigating away
+    document.querySelectorAll('a').forEach(link => {
+        if (link.target !== '_blank' && link.href && !link.href.startsWith('#')) {
+            link.addEventListener('click', function(e) {
+                // Only handle local navigation
+                if (link.host === location.host) {
+                    e.preventDefault();
+                    pageTransition.classList.remove('hide');
+                    setTimeout(() => {
+                        window.location = link.href;
+                    }, 400); // Duration matches CSS transition
+                }
+            });
+        }
     });
-
-    // Tell the observer to watch each hidden element
-    hiddenElements.forEach((el) => observer.observe(el));
 
 });
